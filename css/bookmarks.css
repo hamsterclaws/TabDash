@@ -1,0 +1,150 @@
+/* ── Bookmarks View ──────────────────────────────────────────────────────── */
+.bookmarks-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.bookmarks-search {
+  flex: 1;
+  min-width: 180px;
+}
+
+/* ── Folder ──────────────────────────────────────────────────────────────── */
+.bookmark-folder {
+  margin-bottom: 24px;
+}
+.bookmark-folder-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+  color: var(--text-2);
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.bookmark-folder-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  flex: 1;
+}
+.bookmark-folder-header .folder-actions {
+  display: none;
+  gap: 4px;
+}
+.bookmark-folder-header:hover .folder-actions { display: flex; }
+.folder-toggle-icon {
+  transition: transform 0.2s ease;
+  font-size: 11px;
+}
+.bookmark-folder.collapsed .folder-toggle-icon {
+  transform: rotate(-90deg);
+}
+.bookmark-folder.collapsed .bookmark-grid { display: none; }
+
+/* ── Bookmark Grid ───────────────────────────────────────────────────────── */
+.bookmark-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.bookmark-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 76px;
+  padding: 10px 6px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background var(--transition);
+  position: relative;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.bookmark-card:hover {
+  background: var(--bg-2);
+  border-color: var(--border);
+}
+.bookmark-card.drag-over {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.bookmark-card[draggable="true"] { cursor: grab; }
+.bookmark-card[draggable="true"]:active { cursor: grabbing; }
+.bookmark-card.dragging { opacity: 0.4; }
+
+.bookmark-favicon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+.bookmark-favicon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bookmark-label {
+  font-size: 11px;
+  color: var(--text-2);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+.bookmark-card-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: none;
+  gap: 2px;
+}
+.bookmark-card:hover .bookmark-card-actions { display: flex; }
+.bookmark-card-actions button {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.bookmark-card-actions button:hover { color: var(--text); background: var(--bg-hover); }
+
+/* ── Add bookmark / folder modal form ───────────────────────────────────── */
+.favicon-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 20px;
+}
+.favicon-preview img { width: 100%; height: 100%; object-fit: cover; }
+.favicon-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.favicon-input-row input { flex: 1; }
