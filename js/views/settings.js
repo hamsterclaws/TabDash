@@ -1,7 +1,8 @@
 import { getSettings, saveSettings } from '../db/storage.js';
-import { getAll, clearStore, putBulk, openDB } from '../db/idb.js';
+import { getAll, put, clearStore, putBulk, openDB } from '../db/idb.js';
 import { toast } from '../components/toast.js';
 import * as modal from '../components/modal.js';
+import { parseICS } from '../utils/ics.js';
 
 const ACCENT_COLORS = [
   { label: 'Teal',   value: '#2dd4bf' },
@@ -291,6 +292,19 @@ export async function render(container) {
           </div>
         </div>
 
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Import Calendar (.ics)</div>
+            <div class="settings-desc">Import events from Google Calendar, Apple Calendar, Outlook, or any .ics file. Existing events with matching IDs are updated, not duplicated.</div>
+          </div>
+          <div class="settings-control">
+            <label class="btn btn-ghost" style="cursor:pointer">
+              Import .ics…
+              <input type="file" id="import-ics-input" accept=".ics,text/calendar" style="display:none"/>
+            </label>
+          </div>
+        </div>
+
         <div style="margin-top:12px;padding:10px 14px;background:var(--bg-2);border-radius:var(--radius);border:1px solid var(--border);font-size:12px;color:var(--text-3);line-height:1.6">
           <strong style="color:var(--text-2)">How to share this extension:</strong><br>
           1. Zip the entire <code style="color:var(--accent)">ChromeExtension/</code> folder.<br>
@@ -388,11 +402,42 @@ export async function render(container) {
   // ── Export ──────────────────────────────────────────────────────────────────
   container.querySelector('#export-btn').addEventListener('click', exportAllData);
 
-  // ── Import ──────────────────────────────────────────────────────────────────
+  // ── Import backup ────────────────────────────────────────────────────────────
   container.querySelector('#import-input').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
     importAllData(file);
-    e.target.value = ''; // reset so same file can be re-selected
+    e.target.value = '';
+  });
+
+  // ── Import ICS ───────────────────────────────────────────────────────────────
+  container.querySelector('#import-ics-input').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      toast('Parsing calendar file…');
+      const text   = await file.text();
+      const events = parseICS(text);
+
+      if (!events.length) {
+        toast('No events found in file', 'error');
+        return;
+      }
+
+      // Upsert all events — re-importing the same file won't create duplicates
+      // because each event's id is derived from the ICS UID.
+      let count = 0;
+      for (const ev of events) {
+        await put('events', ev);
+        count++;
+      }
+
+      toast(`Imported ${count} event${count !== 1 ? 's' : ''} from calendar`);
+    } catch (err) {
+      console.error('ICS import failed:', err);
+      toast('Failed to import calendar file', 'error');
+    }
   });
 }

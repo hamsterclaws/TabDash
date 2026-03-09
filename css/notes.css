@@ -85,9 +85,9 @@
 .note-expand-btn.expanded { transform: rotate(90deg); }
 .note-expand-hidden { visibility: hidden; pointer-events: none; }
 .note-children {
-  padding-left: 16px;
+  padding-left: 0;
   border-left: 1px solid var(--border);
-  margin-left: 28px;
+  margin-left: 16px;
 }
 
 /* ── Note Editor ─────────────────────────────────────────────────────────── */

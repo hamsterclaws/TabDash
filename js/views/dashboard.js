@@ -13,6 +13,35 @@ let _clockTimer = null;
 let _handlers = {};
 let _isEditMode = false;
 
+// ── Events widget pref ────────────────────────────────────────────────────────
+const EVENTS_PREF_DEFAULT = { showTomorrow: true, showAll: false };
+
+function getEventsWidgetPref() {
+  return new Promise(res => chrome.storage.local.get({ eventsWidgetPref: EVENTS_PREF_DEFAULT }, r => res(r.eventsWidgetPref)));
+}
+
+function saveEventsWidgetPref(pref) {
+  return new Promise(res => chrome.storage.local.set({ eventsWidgetPref: pref }, res));
+}
+
+function getTomorrowISO() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return toISODate(d);
+}
+
+function filterEventsForWidget(pref, eventsList) {
+  const today = todayISO();
+  const sorted = [...eventsList].sort((a, b) =>
+    (a.date + (a.startTime || '')).localeCompare(b.date + (b.startTime || ''))
+  );
+  if (pref.showAll) {
+    return sorted.filter(e => e.date >= today || e.dashPinned).slice(0, 10);
+  }
+  const endDate = pref.showTomorrow ? getTomorrowISO() : today;
+  return sorted.filter(e => (e.date >= today && e.date <= endDate) || e.dashPinned);
+}
+
 export async function render(container, state = {}) {
   if (_clockTimer) { clearInterval(_clockTimer); _clockTimer = null; }
   for (const [ev, fn] of Object.entries(_handlers)) off(ev, fn);
@@ -24,12 +53,13 @@ export async function render(container, state = {}) {
   upcomingDate.setDate(upcomingDate.getDate() + 7);
   const upcomingISO = toISODate(upcomingDate);
 
-  const [allNotes, allEvents, allGoals, { bookmarks }, widgets] = await Promise.all([
+  const [allNotes, allEvents, allGoals, { bookmarks }, widgets, eventsPref] = await Promise.all([
     getAll('notes'),
     getAll('events'),
     getAll('goals'),
     getBookmarkData(),
     getWidgetConfig(),
+    getEventsWidgetPref(),
   ]);
 
   const pinnedNotes      = allNotes.filter(n => n.pinned === true);
@@ -37,12 +67,12 @@ export async function render(container, state = {}) {
   const upcomingMeetings = allEvents
     .filter(e => e.type === 'meeting' && ((e.date >= today && e.date <= upcomingISO) || e.dashPinned === true))
     .sort((a, b) => (a.date + (a.startTime || '')).localeCompare(b.date + (b.startTime || '')));
-  const upcomingEvents   = allEvents
-    .filter(e => e.type === 'event' && ((e.date >= today && e.date <= upcomingISO) || e.dashPinned === true))
-    .sort((a, b) => (a.date + (a.startTime || '')).localeCompare(b.date + (b.startTime || '')));
+
+  const allEventsList  = allEvents.filter(e => e.type === 'event');
+  const upcomingEvents = filterEventsForWidget(eventsPref, allEventsList);
 
   const sortedWidgets = [...widgets].sort((a, b) => (a.order || 0) - (b.order || 0));
-  const data = { pinnedNotes, activeGoals, todayEvents: upcomingEvents, todayMeetings: upcomingMeetings, bookmarks };
+  const data = { pinnedNotes, activeGoals, todayEvents: upcomingEvents, allEventsList, eventsPref, todayMeetings: upcomingMeetings, bookmarks };
 
   container.innerHTML = `<div class="dashboard-layout"><div id="dash-widgets"></div></div>`;
   injectDashboardStyles();
@@ -147,7 +177,10 @@ function buildWidgetBlock(widget, data) {
   card.innerHTML = `
     <div class="widget-card-header">
       <div class="section-title" style="margin:0">${meta.title}</div>
-      <button class="btn-icon widget-add-btn" title="${meta.addTitle}">+</button>
+      <div style="display:flex;align-items:center;gap:2px">
+        ${widget.id === 'events' ? `<button class="btn-icon widget-cog-btn" title="Filter settings">⚙</button>` : ''}
+        <button class="btn-icon widget-add-btn" title="${meta.addTitle}">+</button>
+      </div>
     </div>
     <div class="widget-body"></div>
   `;
@@ -156,7 +189,13 @@ function buildWidgetBlock(widget, data) {
   });
 
   const body = card.querySelector('.widget-body');
-  if (widget.id === 'events')   renderEventsWidget(body, data.todayEvents);
+  if (widget.id === 'events') {
+    renderEventsWidget(body, data.todayEvents);
+    card.querySelector('.widget-cog-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      if (!_isEditMode) showEventsSettingsPopover(e.currentTarget, data.eventsPref, data.allEventsList, body);
+    });
+  }
   if (widget.id === 'notes')    renderNotesWidget(body, data.pinnedNotes);
   if (widget.id === 'goals')    renderGoalsWidget(body, data.activeGoals);
   if (widget.id === 'meetings') renderMeetingsWidget(body, data.todayMeetings);
@@ -524,6 +563,64 @@ function renderMeetingsWidget(el, meetings) {
   });
 }
 
+// ── Events Widget Settings Popover ────────────────────────────────────────────
+
+function showEventsSettingsPopover(cogBtn, pref, allEventsList, body) {
+  // Toggle — close if already open
+  const existing = document.querySelector('.events-widget-popover');
+  if (existing) { existing.remove(); return; }
+
+  const popover = document.createElement('div');
+  popover.className = 'events-widget-popover';
+  popover.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:0.02em">Event Filter</div>
+    <label class="ewp-row ${pref.showAll ? 'ewp-disabled' : ''}">
+      <input type="checkbox" id="ewp-tomorrow" ${pref.showTomorrow && !pref.showAll ? 'checked' : ''} ${pref.showAll ? 'disabled' : ''}>
+      <span>Include tomorrow</span>
+    </label>
+    <label class="ewp-row">
+      <input type="checkbox" id="ewp-all" ${pref.showAll ? 'checked' : ''}>
+      <span>All upcoming (next 10)</span>
+    </label>
+  `;
+
+  // Position below the cog button, right-aligned
+  const rect = cogBtn.getBoundingClientRect();
+  popover.style.top  = `${rect.bottom + 6}px`;
+  popover.style.right = `${window.innerWidth - rect.right}px`;
+  document.body.appendChild(popover);
+
+  const tomorrowCb = popover.querySelector('#ewp-tomorrow');
+  const allCb      = popover.querySelector('#ewp-all');
+  const tomorrowRow = popover.querySelector('label:first-of-type');
+
+  function syncState() {
+    tomorrowCb.disabled = allCb.checked;
+    tomorrowRow.classList.toggle('ewp-disabled', allCb.checked);
+  }
+
+  async function applyChange() {
+    const newPref = { showTomorrow: tomorrowCb.checked, showAll: allCb.checked };
+    Object.assign(pref, newPref);
+    await saveEventsWidgetPref(newPref);
+    body.innerHTML = '';
+    renderEventsWidget(body, filterEventsForWidget(newPref, allEventsList));
+  }
+
+  tomorrowCb.addEventListener('change', () => { syncState(); applyChange(); });
+  allCb.addEventListener('change',      () => { syncState(); applyChange(); });
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', function onOutside(e) {
+      if (!popover.contains(e.target) && e.target !== cogBtn) {
+        popover.remove();
+        document.removeEventListener('click', onOutside);
+      }
+    });
+  }, 10);
+}
+
 // ── Widget Customize Panel ────────────────────────────────────────────────────
 
 function showCustomizePanel(container, widgets, data) {
@@ -684,6 +781,14 @@ function injectDashboardStyles() {
     .editing .dash-edit-overlay { display: block; }
     .dash-edit-overlay::after { content: '⠿ drag'; position: absolute; top: 8px; right: 8px; background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px 8px; font-size: 11px; color: var(--text-3); cursor: grab; }
     .dash-edit-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg-2); border: 1px solid var(--accent); border-radius: var(--radius-lg); padding: 12px 20px; display: flex; align-items: center; gap: 16px; z-index: 800; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: slideUp 0.15s ease; white-space: nowrap; }
+
+    /* Events widget cog + popover */
+    .widget-cog-btn { font-size: 14px; color: var(--text-3); transition: color var(--transition); }
+    .widget-cog-btn:hover { color: var(--accent); }
+    .events-widget-popover { position: fixed; background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; width: 220px; z-index: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.4); animation: slideUp 0.12s ease; }
+    .ewp-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; font-size: 13px; color: var(--text-2); border-radius: 4px; transition: color var(--transition); }
+    .ewp-row:hover { color: var(--text); }
+    .ewp-disabled { opacity: 0.4; cursor: default; pointer-events: none; }
   `;
   document.head.appendChild(s);
 }

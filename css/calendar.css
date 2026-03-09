@@ -56,7 +56,7 @@
 /* ── Month Grid ──────────────────────────────────────────────────────────── */
 .cal-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
@@ -72,6 +72,9 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-3);
+  /* Prevent header cells from influencing column width */
+  min-width: 0;
+  overflow: hidden;
 }
 .cal-cell {
   background: var(--bg-2);
@@ -80,6 +83,9 @@
   cursor: pointer;
   transition: background var(--transition);
   position: relative;
+  /* Prevent content from stretching the column */
+  min-width: 0;
+  overflow: hidden;
 }
 .cal-cell:hover { background: var(--bg-hover); }
 .cal-cell.other-month { background: var(--bg); opacity: 0.5; }
@@ -127,6 +133,9 @@
   text-overflow: ellipsis;
   margin-top: 2px;
   border-left: 2px solid var(--accent);
+  /* Must not escape the cell */
+  max-width: 100%;
+  display: block;
 }
 
 /* ── Week View ───────────────────────────────────────────────────────────── */
