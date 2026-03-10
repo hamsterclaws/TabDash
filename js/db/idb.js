@@ -40,12 +40,20 @@ export function remove(store, id) {
 }
 
 export function getByIndex(store, indexName, value) {
-  return req2p(tx(store).index(indexName).getAll(value));
+  try {
+    return req2p(tx(store).index(indexName).getAll(value)).catch(() => []);
+  } catch {
+    return Promise.resolve([]);
+  }
 }
 
 export function getByDateRange(store, indexName, lower, upper) {
-  const range = IDBKeyRange.bound(lower, upper);
-  return req2p(tx(store).index(indexName).getAll(range));
+  try {
+    const range = IDBKeyRange.bound(lower, upper);
+    return req2p(tx(store).index(indexName).getAll(range)).catch(() => []);
+  } catch {
+    return Promise.resolve([]);
+  }
 }
 
 export function getAllByIndex(store, indexName) {

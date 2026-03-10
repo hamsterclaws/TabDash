@@ -131,11 +131,19 @@ function renderWidgets(container, allWidgets, sortedWidgets, data) {
     _clockTimer = setInterval(tick, 1000);
   }
 
-  // Clock action buttons
-  grid.querySelector('#dash-customize-btn')?.addEventListener('click', () => {
+  // Persistent bottom-left floating action bar
+  const fab = document.createElement('div');
+  fab.className = 'dash-fab';
+  fab.innerHTML = `
+    <button class="btn btn-ghost dash-fab-btn" id="dash-customize-btn" title="Customize Widgets">⚙ Customize</button>
+    <button class="btn btn-ghost dash-fab-btn" id="dash-edit-layout-btn" title="Edit Layout">✎ Layout</button>
+  `;
+  area.appendChild(fab);
+
+  fab.querySelector('#dash-customize-btn').addEventListener('click', () => {
     showCustomizePanel(container, allWidgets, data);
   });
-  grid.querySelector('#dash-edit-layout-btn')?.addEventListener('click', () => {
+  fab.querySelector('#dash-edit-layout-btn').addEventListener('click', () => {
     activateEditMode(grid, allWidgets, container);
   });
 }
@@ -150,10 +158,6 @@ function buildWidgetBlock(widget, data) {
       <div class="dashboard-clock-section">
         <div class="dashboard-time" id="dash-time"></div>
         <div class="dashboard-date" id="dash-date"></div>
-        <div class="dash-clock-btns">
-          <button class="btn btn-ghost" id="dash-customize-btn" style="font-size:12px">⚙ Customize Widgets</button>
-          <button class="btn btn-ghost" id="dash-edit-layout-btn" style="font-size:12px">✎ Edit Layout</button>
-        </div>
       </div>
     `;
     return block;
@@ -752,8 +756,11 @@ function injectDashboardStyles() {
     .dashboard-clock-section { text-align: center; padding: 24px 0 20px; }
     .dashboard-time { font-size: 52px; font-weight: 800; letter-spacing: -2px; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1; }
     .dashboard-date { font-size: 15px; color: var(--text-3); margin-top: 6px; }
-    .dash-clock-btns { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
     .dashboard-section { margin-bottom: 4px; }
+    .dash-fab { position: fixed; bottom: 20px; left: calc(var(--sidebar-w) + var(--app-inset) * 2 + 16px); display: flex; gap: 6px; z-index: 200; transition: left var(--transition); }
+    #app.sidebar-collapsed .dash-fab { left: calc(56px + var(--app-inset) * 2 + 16px); }
+    .dash-fab-btn { font-size: 12px; opacity: 0.55; transition: opacity var(--transition), background var(--transition); }
+    .dash-fab-btn:hover { opacity: 1; }
     .widget-card-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
     .widget-add-btn { font-size:20px;line-height:1;color:var(--text-3);transition:color var(--transition); }
     .widget-add-btn:hover { color:var(--accent); }

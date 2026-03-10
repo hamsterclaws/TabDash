@@ -1,4 +1,5 @@
 import { getSettings, saveSettings } from '../db/storage.js';
+import { applyGoogleFont } from '../app.js';
 import { getAll, put, clearStore, putBulk, openDB } from '../db/idb.js';
 import { toast } from '../components/toast.js';
 import * as modal from '../components/modal.js';
@@ -212,6 +213,35 @@ export async function render(container) {
         </div>
       </div>
 
+      <!-- Typography -->
+      <div class="settings-section">
+        <div class="settings-section-title">Typography</div>
+
+        <div class="settings-row" style="align-items:flex-start;padding-bottom:16px">
+          <div style="flex:1;margin-right:16px">
+            <div class="settings-label">Google Font</div>
+            <div class="settings-desc" style="margin-bottom:10px">
+              Paste the <code style="color:var(--accent);font-size:11px">@import</code> line from
+              <a href="#" style="color:var(--accent)" onclick="return false">fonts.google.com</a>.
+              Then enter the font family name exactly as shown on Google Fonts.
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <textarea id="gf-import-input" rows="3"
+                placeholder="@import url('https://fonts.googleapis.com/css2?family=Inter…&display=swap');"
+                style="width:100%;resize:vertical;font-size:12px;font-family:var(--font-mono)">${settings.googleFontsImport || ''}</textarea>
+              <input type="text" id="gf-family-input"
+                placeholder="Font family name, e.g. Inter"
+                value="${settings.googleFontsFamily || ''}"
+                style="width:100%"/>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-primary" id="gf-apply-btn">Apply Font</button>
+                <button class="btn btn-ghost" id="gf-clear-btn">Reset to System Font</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Clock & Date -->
       <div class="settings-section">
         <div class="settings-section-title">Clock & Date</div>
@@ -408,6 +438,24 @@ export async function render(container) {
     if (!file) return;
     importAllData(file);
     e.target.value = '';
+  });
+
+  // ── Google Fonts ─────────────────────────────────────────────────────────────
+  container.querySelector('#gf-apply-btn').addEventListener('click', async () => {
+    const importStr = container.querySelector('#gf-import-input').value.trim();
+    const family    = container.querySelector('#gf-family-input').value.trim();
+    if (!importStr || !family) { toast('Paste the @import line and enter the font family name', 'error'); return; }
+    await saveSettings({ googleFontsImport: importStr, googleFontsFamily: family });
+    applyGoogleFont(importStr, family);
+    toast(`Font applied: ${family}`);
+  });
+
+  container.querySelector('#gf-clear-btn').addEventListener('click', async () => {
+    await saveSettings({ googleFontsImport: '', googleFontsFamily: '' });
+    applyGoogleFont('', '');
+    container.querySelector('#gf-import-input').value = '';
+    container.querySelector('#gf-family-input').value = '';
+    toast('Reset to system font');
   });
 
   // ── Import ICS ───────────────────────────────────────────────────────────────

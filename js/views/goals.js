@@ -417,8 +417,7 @@ function renderTasks(listEl, tasks, goal, pane, container) {
         createdAt: Date.now(),
       };
       await put('tasks', task);
-      if (!allTasks[goal.id]) allTasks[goal.id] = [];
-      allTasks[goal.id].push(task);
+      if (!allTasks[goal.id]) allTasks[goal.id] = tasks;
       tasks.push(task);
       addInput.value = '';
       renderTasks(listEl, tasks, goal, pane, container);

@@ -23,6 +23,11 @@ async function init() {
     document.documentElement.style.setProperty('--accent', settings.accentColor);
   }
 
+  // Apply saved Google Font
+  if (settings.googleFontsImport && settings.googleFontsFamily) {
+    applyGoogleFont(settings.googleFontsImport, settings.googleFontsFamily);
+  }
+
   // Render the shell (sidebar + topbar + clock)
   await renderShell((viewId) => navigate(viewId));
 
@@ -135,6 +140,34 @@ function showViewPicker() {
       overlay.innerHTML = '';
     }
   });
+}
+
+export function applyGoogleFont(importStr, family) {
+  // Remove any previous font injection
+  document.getElementById('gf-link')?.remove();
+
+  if (!importStr || !family) {
+    // Restore the default --font value (remove inline override)
+    document.documentElement.style.removeProperty('--font');
+    return;
+  }
+
+  // Strip <style>…</style> wrapper if the user pasted the full embed block
+  let raw = importStr.replace(/<style[^>]*>|<\/style>/gi, '').trim();
+
+  // Extract the URL from @import url('…') or a bare https:// URL
+  const match = raw.match(/url\(['"]?([^'")\s]+)['"]?\)/i);
+  const url = match ? match[1] : raw;
+
+  // Inject as <link rel="stylesheet"> — works in extension pages
+  const link = document.createElement('link');
+  link.id  = 'gf-link';
+  link.rel = 'stylesheet';
+  link.href = url;
+  document.head.appendChild(link);
+
+  // Override --font so every element picks up the new typeface
+  document.documentElement.style.setProperty('--font', `'${family}', system-ui, sans-serif`);
 }
 
 init().catch(console.error);

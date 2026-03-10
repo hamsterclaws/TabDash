@@ -8,6 +8,8 @@ const DEFAULT_SETTINGS = {
   defaultView: 'dashboard',
   sidebarCollapsed: false,
   brandName: 'Productivity',
+  googleFontsImport: '',
+  googleFontsFamily: '',
 };
 
 export function getSettings() {

@@ -3,7 +3,7 @@
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: 24px;
-  height: calc(100vh - var(--topbar-h) - 48px);
+  height: calc(100vh - var(--topbar-h) - 48px - 2 * var(--app-inset));
   overflow: hidden;
 }
 .calendar-main { overflow-y: auto; }
