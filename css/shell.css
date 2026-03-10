@@ -112,10 +112,13 @@
 #app.sidebar-collapsed .nav-item {
   justify-content: center;
   padding: 10px 0;
+  margin: 2px 0;
+  gap: 0;
 }
 #app.sidebar-collapsed .sidebar-collapse-btn {
   justify-content: center;
   padding: 10px 0;
+  gap: 0;
 }
 
 /* Collapse button */
