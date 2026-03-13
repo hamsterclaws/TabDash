@@ -3,6 +3,8 @@
 const DEFAULT_SETTINGS = {
   theme: 'dark',
   accentColor: '#2dd4bf',
+  bgColor: '#000000',
+  bg2Color: '#1a1a1a',
   clockFormat: '12h',
   weekStartsOn: 0,
   defaultView: 'dashboard',

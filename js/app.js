@@ -23,6 +23,16 @@ async function init() {
     document.documentElement.style.setProperty('--accent', settings.accentColor);
   }
 
+  // Apply saved background color
+  if (settings.bgColor) {
+    document.documentElement.style.setProperty('--bg', settings.bgColor);
+  }
+
+  // Apply saved background 2 color
+  if (settings.bg2Color) {
+    document.documentElement.style.setProperty('--bg-2', settings.bg2Color);
+  }
+
   // Apply saved Google Font
   if (settings.googleFontsImport && settings.googleFontsFamily) {
     applyGoogleFont(settings.googleFontsImport, settings.googleFontsFamily);

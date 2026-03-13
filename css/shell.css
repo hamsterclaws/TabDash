@@ -50,6 +50,11 @@
   opacity: 0;
   width: 0;
 }
+#app.sidebar-collapsed .sidebar-logo {
+  justify-content: center;
+  padding: 18px 0;
+  gap: 0;
+}
 
 /* Nav items */
 .sidebar-nav {

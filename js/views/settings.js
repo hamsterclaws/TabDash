@@ -187,17 +187,26 @@ export async function render(container) {
           <div>
             <div class="settings-label">Accent Color</div>
             <div class="settings-desc">Highlight color used across the dashboard.</div>
+            <div class="settings-desc">Change the colour of the background.</div>
+
           </div>
           <div class="settings-control" style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
             <input type="color" id="accent-color-wheel" value="${settings.accentColor || '#2dd4bf'}"
               title="Pick any color"
-              style="width:48px;height:36px;padding:2px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg-3)"/>
+              style="width:128px;height:36px;padding:2px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg-3)"/>
             <div class="accent-swatches" id="accent-swatches">
               ${ACCENT_COLORS.map(c => `
                 <div class="accent-swatch ${settings.accentColor === c.value ? 'selected' : ''}"
                   data-color="${c.value}" style="background:${c.value}" title="${c.label}"></div>
               `).join('')}
             </div>
+            <input type="color" id="background-color-wheel" value="${settings.bgColor || '#2dd4bf'}"
+              title="Pick any color"
+              style="width:128px;height:36px;padding:2px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg-3)"/>
+            <input type="color" id="background2-color-wheel" value="${settings.bg2Color || '#2dd4bf'}"
+              title="Pick any color"
+              style="width:128px;height:36px;padding:2px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;background:var(--bg-3)"/>
+            
           </div>
         </div>
 
@@ -371,6 +380,8 @@ export async function render(container) {
 
   // ── Accent color ────────────────────────────────────────────────────────────
   const colorWheel = container.querySelector('#accent-color-wheel');
+  const bgColorWheel = container.querySelector('#background-color-wheel');
+  const bg2ColorWheel = container.querySelector('#background2-color-wheel');
   colorWheel.addEventListener('input', e => {
     document.documentElement.style.setProperty('--accent', e.target.value);
     container.querySelectorAll('.accent-swatch').forEach(s => s.classList.remove('selected'));
@@ -378,6 +389,24 @@ export async function render(container) {
   colorWheel.addEventListener('change', async e => {
     await saveSettings({ accentColor: e.target.value });
     toast('Accent color updated');
+  });
+//main background color
+  bgColorWheel.addEventListener('input', e => {
+    document.documentElement.style.setProperty('--bg', e.target.value);
+    container.querySelectorAll('.accent-swatch').forEach(s => s.classList.remove('selected'));
+  });
+  bgColorWheel.addEventListener('change', async e => {
+    await saveSettings({ bgColor: e.target.value });
+    toast('Accent color updated');
+  });
+//background 2 color wheel
+    bg2ColorWheel.addEventListener('input', e => {
+    document.documentElement.style.setProperty('--bg-2', e.target.value);
+    container.querySelectorAll('.accent-swatch').forEach(s => s.classList.remove('selected'));
+  });
+  bg2ColorWheel.addEventListener('change', async e => {
+    await saveSettings({ bg2Color: e.target.value });
+    toast('Background color updated');
   });
 
   container.querySelectorAll('.accent-swatch').forEach(sw => {
@@ -441,10 +470,31 @@ export async function render(container) {
   });
 
   // ── Google Fonts ─────────────────────────────────────────────────────────────
+  function extractFontFamily(importStr) {
+    const raw = importStr.replace(/<style[^>]*>|<\/style>/gi, '').trim();
+    const urlMatch = raw.match(/url\(['"]?([^'")\s]+)['"]?\)/i);
+    const urlStr = urlMatch ? urlMatch[1] : raw;
+    try {
+      const family = new URL(urlStr).searchParams.get('family');
+      if (family) return family.split('|')[0].split(':')[0].split(';')[0].trim();
+    } catch {}
+    return '';
+  }
+
+  const gfImportInput = container.querySelector('#gf-import-input');
+  const gfFamilyInput = container.querySelector('#gf-family-input');
+
+  gfImportInput.addEventListener('input', () => {
+    const extracted = extractFontFamily(gfImportInput.value.trim());
+    if (extracted) gfFamilyInput.value = extracted;
+  });
+
   container.querySelector('#gf-apply-btn').addEventListener('click', async () => {
-    const importStr = container.querySelector('#gf-import-input').value.trim();
-    const family    = container.querySelector('#gf-family-input').value.trim();
-    if (!importStr || !family) { toast('Paste the @import line and enter the font family name', 'error'); return; }
+    const importStr = gfImportInput.value.trim();
+    let family = gfFamilyInput.value.trim() || extractFontFamily(importStr);
+    if (!importStr) { toast('Paste the @import line', 'error'); return; }
+    if (!family) { toast('Could not detect font name — enter it manually', 'error'); return; }
+    gfFamilyInput.value = family;
     await saveSettings({ googleFontsImport: importStr, googleFontsFamily: family });
     applyGoogleFont(importStr, family);
     toast(`Font applied: ${family}`);
