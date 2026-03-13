@@ -8,7 +8,7 @@
 }
 .meeting-date-group {
   padding: 8px 16px 4px;
-  font-size: 10px;
+  font-size: calc(10px * var(--fs-scale, 1));
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -37,14 +37,14 @@
 }
 .meeting-item-info { flex: 1; min-width: 0; }
 .meeting-item-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .meeting-item-time {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   color: var(--text-3);
   margin-top: 2px;
 }
@@ -52,7 +52,7 @@
 /* ── Meeting Editor ──────────────────────────────────────────────────────── */
 .meeting-editor { padding: 0; }
 .meeting-editor-title {
-  font-size: 22px;
+  font-size: calc(22px * var(--fs-scale, 1));
   font-weight: 700;
   background: transparent;
   border: none;
@@ -86,12 +86,12 @@
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
   border-radius: 20px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs-scale, 1));
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .attendee-tag button {
   color: var(--accent);
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   line-height: 1;
   opacity: 0.7;
 }
@@ -100,7 +100,7 @@
   border: none;
   background: transparent;
   outline: none;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   color: var(--text);
   min-width: 120px;
   flex: 1;

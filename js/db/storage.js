@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   brandName: 'Productivity',
   googleFontsImport: '',
   googleFontsFamily: '',
+  fontSize: 14,
 };
 
 export function getSettings() {

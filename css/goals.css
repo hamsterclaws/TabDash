@@ -32,7 +32,7 @@
   flex-shrink: 0;
 }
 .goal-item-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   font-weight: 600;
   flex: 1;
   white-space: nowrap;
@@ -40,18 +40,18 @@
   text-overflow: ellipsis;
 }
 .goal-item-progress-text {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   font-weight: 700;
   color: var(--text-2);
   font-variant-numeric: tabular-nums;
 }
 .goal-item-category {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   color: var(--text-3);
   margin-bottom: 6px;
 }
 .goal-item-target {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   color: var(--text-3);
   margin-top: 4px;
 }
@@ -59,7 +59,7 @@
   display: inline-block;
   padding: 1px 7px;
   border-radius: 20px;
-  font-size: 10px;
+  font-size: calc(10px * var(--fs-scale, 1));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -71,7 +71,7 @@
 /* ── Goal Detail ─────────────────────────────────────────────────────────── */
 .goal-editor {}
 .goal-editor-title {
-  font-size: 22px;
+  font-size: calc(22px * var(--fs-scale, 1));
   font-weight: 700;
   background: transparent;
   border: none;
@@ -88,7 +88,7 @@
   margin-bottom: 20px;
 }
 .goal-progress-pct {
-  font-size: 28px;
+  font-size: calc(28px * var(--fs-scale, 1));
   font-weight: 800;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
@@ -96,7 +96,7 @@
 }
 .goal-progress-bar-wrap { flex: 1; }
 .goal-progress-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   color: var(--text-3);
   margin-top: 4px;
 }
@@ -133,7 +133,7 @@
   flex-shrink: 0;
   transition: background var(--transition), border-color var(--transition);
   background: transparent;
-  font-size: 10px;
+  font-size: calc(10px * var(--fs-scale, 1));
   color: transparent;
 }
 .task-item.done .task-checkbox {
@@ -143,7 +143,7 @@
 }
 .task-title {
   flex: 1;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   color: var(--text);
   background: transparent;
   border: none;
@@ -156,7 +156,7 @@
   color: var(--text-3);
 }
 .task-priority-select {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   padding: 2px 6px;
   background: var(--bg-3);
   border: 1px solid var(--border);
@@ -165,14 +165,14 @@
   cursor: pointer;
 }
 .task-due {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   color: var(--text-3);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 .task-delete-btn {
   opacity: 0;
-  font-size: 14px;
+  font-size: calc(14px * var(--fs-scale, 1));
   color: var(--text-3);
   cursor: pointer;
   transition: opacity var(--transition), color var(--transition);
@@ -191,7 +191,7 @@
   border: 1px dashed var(--border);
   cursor: text;
   color: var(--text-3);
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   transition: border-color var(--transition), color var(--transition);
 }
 .add-task-row:focus-within {
@@ -203,7 +203,7 @@
   border: none;
   background: transparent;
   outline: none;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   color: var(--text);
   font-family: inherit;
   padding: 0;
@@ -225,14 +225,14 @@
 }
 .goal-widget-info { flex: 1; min-width: 0; }
 .goal-widget-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .goal-widget-pct {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   font-weight: 700;
   color: var(--accent);
   font-variant-numeric: tabular-nums;

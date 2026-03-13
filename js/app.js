@@ -33,6 +33,11 @@ async function init() {
     document.documentElement.style.setProperty('--bg-2', settings.bg2Color);
   }
 
+  // Apply saved font size (scales only font-size properties, not layout)
+  if (settings.fontSize && settings.fontSize !== 14) {
+    document.documentElement.style.setProperty('--fs-scale', String(settings.fontSize / 14));
+  }
+
   // Apply saved Google Font
   if (settings.googleFontsImport && settings.googleFontsFamily) {
     applyGoogleFont(settings.googleFontsImport, settings.googleFontsFamily);

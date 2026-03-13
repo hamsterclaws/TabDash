@@ -27,7 +27,7 @@
   margin-bottom: 12px;
 }
 .bookmark-folder-name {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   font-weight: 700;
   color: var(--text-2);
   flex: 1;
@@ -39,7 +39,7 @@
 .bookmark-folder-header:hover .folder-actions { display: flex; }
 .folder-toggle-icon {
   transition: transform 0.2s ease;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
 }
 .bookmark-folder.collapsed .folder-toggle-icon {
   transform: rotate(-90deg);
@@ -89,7 +89,7 @@
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  font-size: 18px;
+  font-size: calc(18px * var(--fs-scale, 1));
 }
 .bookmark-favicon img {
   width: 100%;
@@ -97,7 +97,7 @@
   object-fit: cover;
 }
 .bookmark-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   color: var(--text-2);
   text-align: center;
   white-space: nowrap;
@@ -119,7 +119,7 @@
   border-radius: 4px;
   background: var(--bg-3);
   border: 1px solid var(--border);
-  font-size: 10px;
+  font-size: calc(10px * var(--fs-scale, 1));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,7 +139,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  font-size: 20px;
+  font-size: calc(20px * var(--fs-scale, 1));
 }
 .favicon-preview img { width: 100%; height: 100%; object-fit: cover; }
 .favicon-input-row {

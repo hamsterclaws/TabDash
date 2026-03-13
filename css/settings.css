@@ -6,7 +6,7 @@
   margin-bottom: 32px;
 }
 .settings-section-title {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   font-weight: 700;
   color: var(--text);
   margin-bottom: 12px;
@@ -21,8 +21,8 @@
   border-bottom: 1px solid var(--border);
 }
 .settings-row:last-child { border-bottom: none; }
-.settings-label { font-size: 13px; color: var(--text); }
-.settings-desc { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.settings-label { font-size: calc(13px * var(--fs-scale, 1)); color: var(--text); }
+.settings-desc { font-size: calc(12px * var(--fs-scale, 1)); color: var(--text-3); margin-top: 2px; }
 .settings-control { flex-shrink: 0; }
 
 /* ── Toggle Switch ───────────────────────────────────────────────────────── */
@@ -88,7 +88,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs-scale, 1));
   color: var(--text-2);
 }
 .shortcut-key {
@@ -102,7 +102,7 @@
   border-radius: 4px;
   background: var(--bg-3);
   border: 1px solid var(--border);
-  font-size: 11px;
+  font-size: calc(11px * var(--fs-scale, 1));
   font-family: var(--font-mono);
   color: var(--text-2);
 }

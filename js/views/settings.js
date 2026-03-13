@@ -249,6 +249,21 @@ export async function render(container) {
             </div>
           </div>
         </div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">Font Size</div>
+            <div class="settings-desc">Scale all text up or down.</div>
+          </div>
+          <div class="settings-control" style="display:flex;align-items:center;gap:6px">
+            <button class="btn btn-ghost" id="font-size-dec" style="width:28px;height:28px;padding:0;font-size:16px;display:flex;align-items:center;justify-content:center">−</button>
+            <span id="font-size-label"
+              style="font-size:13px;color:var(--text-2);min-width:36px;text-align:center;line-height:28px">
+              ${settings.fontSize || 14}px
+            </span>
+            <button class="btn btn-ghost" id="font-size-inc" style="width:28px;height:28px;padding:0;font-size:16px;display:flex;align-items:center;justify-content:center">+</button>
+          </div>
+        </div>
       </div>
 
       <!-- Clock & Date -->
@@ -507,6 +522,21 @@ export async function render(container) {
     container.querySelector('#gf-family-input').value = '';
     toast('Reset to system font');
   });
+
+  // ── Font size ─────────────────────────────────────────────────────────────
+  const fontSizeLabel = container.querySelector('#font-size-label');
+  let currentFontSize = settings.fontSize || 14;
+
+  async function applyFontSize(size) {
+    size = Math.min(20, Math.max(11, size));
+    currentFontSize = size;
+    fontSizeLabel.textContent = size + 'px';
+    document.documentElement.style.setProperty('--fs-scale', String(size / 14));
+    await saveSettings({ fontSize: size });
+  }
+
+  container.querySelector('#font-size-dec').addEventListener('click', () => applyFontSize(currentFontSize - 1));
+  container.querySelector('#font-size-inc').addEventListener('click', () => applyFontSize(currentFontSize + 1));
 
   // ── Import ICS ───────────────────────────────────────────────────────────────
   container.querySelector('#import-ics-input').addEventListener('change', async e => {
